@@ -21,23 +21,20 @@ class IDGen:
         y=input('please input city:')
         z=input('please input county:')
         return self.state.get(x)+self.city.get(y)+self.county.get(z)
-    def GetNumDict(self,menu):
-        IDGen.SetNum
-        
-        if menu=='state':
-            
-            return self.state
-        if menu=='city':
-            return self.city
-        if menu=='county':
-            return self.county
+##    def GetNumDict(self,menu):
+##        if menu=='state':   
+##            return self.state
+##        if menu=='city':
+##            return self.city
+##        if menu=='county':
+##            return self.county
     def GetID(self):
         a=self.SetNum()
         birth=input('please input birthday:')
         id1=str()
         id1=a+birth+str(random.randint(10,99))+str(self.SetSex())
 
-        count = 0
+        count = 0 #计算校验码
         weight = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2] #权重项
         checkcode ={'0':'1','1':'0','2':'X','3':'9','4':'8','5':'7','6':'6','7':'5','8':'5','9':'3','10':'2'} #校验码映射
         for i in range(0,len(id1)):

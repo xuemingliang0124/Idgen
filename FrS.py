@@ -2,35 +2,35 @@
 import os
 import random
 class IDGen:
-    
-    def SetNum(self):
-        city={}
-        state={}
-        county={}
+    def __init__(self):
+        self.city={}
+        self.state={}
+        self.county={}
         file=open('e:\\city2.txt')
         a=file.read()
         src1=a.split('\n')
         for line in src1:
-            if line[:1]!=' ' :
-                state[line[11:]]=line[0:2]
-            if line[2:3]!=' ' and line[7:8]!=' ':
-                city[line[17:]]=line[4:6]
-            if line[8:9]!=' ' :
-                county[line[15:]]=line[8:10]
+                if line[:1]!=' ' :
+                        self.state[line[11:]]=line[0:2]
+                if line[2:3]!=' ' and line[7:8]!=' ':
+                        self.city[line[17:]]=line[4:6]
+                if line[8:9]!=' ' :
+                        self.county[line[15:]]=line[8:10]
+    def SetNum(self):        
         x=input('please input state:')
         y=input('please input city:')
         z=input('please input county:')
-        return state.get(x)+city.get(y)+county.get(z)
+        return self.state.get(x)+self.city.get(y)+self.county.get(z)
     def GetNumDict(self,menu):
         IDGen.SetNum
         
         if menu=='state':
             
-            return IDGen.state
+            return self.state
         if menu=='city':
-            return IDGen.city
+            return self.city
         if menu=='county':
-            return IDGen.county
+            return self.county
     def GetID(self):
         a=self.SetNum()
         birth=input('please input birthday:')
@@ -58,7 +58,3 @@ class IDGen:
     def PersonID(self):
         ID=self.GetID()
         return ID
-a=IDGen()
-print(a.SetNum)
-
-##print(a.GetNumDict('state'))

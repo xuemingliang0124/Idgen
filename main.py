@@ -1,4 +1,5 @@
 # coding=utf-8
-import FrS
-Person=FrS.PersonID()
-print(Person)
+from FrS import IDGen
+
+Person=IDGen()
+print(Person.PersonID())

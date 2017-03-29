@@ -1,7 +1,7 @@
 # coding=utf-8
 import os
 import random
-def GetNum(x='北京市',y='市辖区',z='东城区'):
+def GetNum(x,y,z):
     city={}
     state={}
     county={}

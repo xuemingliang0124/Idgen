@@ -21,13 +21,13 @@ class IDGen:
         y=input('please input city:')
         z=input('please input county:')
         return self.state.get(x)+self.city.get(y)+self.county.get(z)
-##    def GetNumDict(self,menu):
-##        if menu=='state':   
-##            return self.state
-##        if menu=='city':
-##            return self.city
-##        if menu=='county':
-##            return self.county
+    def GetNumDict(self,menu):
+        if menu=='state':   
+            return self.state
+        if menu=='city':
+            return self.city
+        if menu=='county':
+            return self.county
     def GetID(self):
         a=self.SetNum()
         birth=input('please input birthday:')

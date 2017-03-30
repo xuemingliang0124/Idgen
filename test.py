@@ -44,6 +44,7 @@ year['values']=(year1)
 year.grid(column=0,row=4)
 year.current(0)
 
+
 month=ttk.Combobox(win,width=12,textvariable='月')
 month1=[x for x in range(1,13)]
 month['values']=(month1)
@@ -56,9 +57,16 @@ day['values']=(month1)
 day.grid(column=2,row=4)
 day.current(0)
 #生成按钮
-action = ttk.Button(win,text='生成',command=clickMe)
+
+def clickMe(self):
+    state3=state.get()
+    city3=city.get()
+    county3=county.get()
+    year3=year.get()
+    
+action = ttk.Button(win,text='生成',command=self.clickMe())
 action.grid(column=2,row=6)
 
-def clickMe():
-    pass
+
+win.resizable(False,False)
 win.mainloop()

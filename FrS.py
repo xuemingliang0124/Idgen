@@ -1,28 +1,33 @@
 # coding=utf-8
 import os
 import random
-import sqlite3
+import sqlite3 as sql
 class IDGen:
     def __init__(self):
-        self.city={}
+        add=os.getcwd()
+        os.system(add+'\\sqlite_pre.py')
         self.state={}
+        self.city={}
         self.county={}
-        file=open('e:\\city2.txt')
-        a=file.read()
-        src1=a.split('\n')
-        for line in src1:
-                if line[:1]!=' ' :
-                        self.state[line[11:]]=line[0:2]
-                if line[2:3]!=' ' and line[7:8]!=' ':
-                        self.city[line[17:]]=line[4:6]
-                if line[8:9]!=' ' :
-                        self.county[line[15:]]=line[8:10]
+        con=sql.connect(add+'\\addr')
+        cur=con.cursor()
+        data=cur.execute('select sta,sta_val from state')
+        for i in data:
+            self.state.update({i[0],i[1]})
+        data=cur.execute('select city,city_val from city')
+        for i in data:
+            self.city.update({i[0],i[1]})
+        data=cur.execute('select coun,cou_val from county')
+        for i in data:
+            self.county.update({i[0],i[1]})
+        cur.close()
+        con.close()
     def SetNum(self):        
         x=input('please input state:')
         y=input('please input city:')
         z=input('please input county:')
         return self.state.get(x)+self.city.get(y)+self.county.get(z)
-    def GetNumDict(self,menu):
+    def GetNumList(self,menu):
         if menu=='state':   
             return self.state
         if menu=='city':

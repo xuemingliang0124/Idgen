@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import random
+import sqlite3
 class IDGen:
     def __init__(self):
         self.city={}

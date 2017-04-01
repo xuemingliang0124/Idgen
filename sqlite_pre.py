@@ -2,7 +2,9 @@
 import os
 import sqlite3
 
-con=sqlite3.connect('e:\\xueml\\xuemlbackup\\addr')  #连接数数据库，不存在就创建
+a=os.getcwd()
+print(a)
+con=sqlite3.connect(a+'\\addr')  #连接数数据库，不存在就创建
 cur=con.cursor() #创建游标
 cur.execute('drop table if exists state;')
 cur.execute('drop table if exists city;')
@@ -29,8 +31,8 @@ city_ins='INSERT INTO CITY (ID,CITY,CITY_VAL,STA_VAL) VALUES (?,?,?,?)'
 coun_ins='INSERT INTO COUNTY (ID,COUNTY,COU_VAL,CITY_VAL,STA_VAL) VALUES (?,?,?,?,?)'
 
 file=open('e:\\city2.txt')
-a=file.read()
-src1=a.split('\n')
+b=file.read()
+src1=b.split('\n')
 x=0
 y=0
 z=0
@@ -49,3 +51,4 @@ for line in src1:
 con.commit()#提交修改
 cur.close()#关闭游标
 con.close()#关闭数据库连接
+

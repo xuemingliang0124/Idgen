@@ -2,8 +2,9 @@ import os
 state={}
 city={}
 county={}
-file1=open('e:\\city.txt')
-file2=open('e:\\city2.txt','w')
+addr=os.getcwd()
+file1=open(addr+'\\city.txt')
+file2=open(addr+'\\city2.txt','w')
 a=file1.readlines()
 for each in a:
     if each=='\n':

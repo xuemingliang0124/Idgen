@@ -4,22 +4,22 @@ import random
 import sqlite3 as sql
 class IDGen:
     def __init__(self):
-        add=os.getcwd()
-        os.system(add+'\\sqlite_pre.py')
+        addr=os.getcwd()
+        os.system(addr+'\\sqlite_pre.py')
         self.state={}
         self.city={}
         self.county={}
-        con=sql.connect(add+'\\addr')
+        con=sql.connect(addr+'\\city')
         cur=con.cursor()
         data=cur.execute('select sta,sta_val from state')
         for i in data:
-            self.state.update({i[0],i[1]})
+            self.state.update({i[0]:i[1]})
         data=cur.execute('select city,city_val from city')
         for i in data:
-            self.city.update({i[0],i[1]})
-        data=cur.execute('select coun,cou_val from county')
+            self.city.update({i[0]:i[1]})
+        data=cur.execute('select county,cou_val from county')
         for i in data:
-            self.county.update({i[0],i[1]})
+            self.county.update({i[0]:i[1]})
         cur.close()
         con.close()
     def SetNum(self):        

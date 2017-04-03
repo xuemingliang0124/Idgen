@@ -5,19 +5,19 @@ import sqlite3
 addr=os.getcwd()
 con=sqlite3.connect(addr+'\\city')  #连接数数据库，不存在就创建
 cur=con.cursor() #创建游标
-cur.execute('drop table if exists state;')
-cur.execute('drop table if exists city;')
-cur.execute('drop table if exists county;') #清理旧库
-cur.execute('create table if not exists state(\
-id int primary key not null,\
+cur.execute('DROP TABLE IF EXISTS STATES;')
+cur.execute('DROP TABLE IF EXISTS CITYS;')
+cur.execute('DROP TABLE IF EXISTS COUNTYS;') #清理旧库
+cur.execute('CREATE TABLE IF NOT EXISTS STATES(\
+ID INT PRIMARY KEY NOT NULL,\
 STA TEXT NOT NULL,\
 STA_VAL TEXT NOT NULL);')
-cur.execute('CREATE TABLE IF NOT EXISTS CITY(\
+cur.execute('CREATE TABLE IF NOT EXISTS CITYS(\
 ID INT PRIMARY KEY NOT NULL,\
 CITY TEXT NOT NULL,\
 CITY_VAL TEXT NOT NULL,\
 STA_VAL TEXT NOT NULL);')
-cur.execute('CREATE TABLE IF NOT EXISTS COUNTY(\
+cur.execute('CREATE TABLE IF NOT EXISTS COUNTYS(\
 ID INT PRIMARY KEY NOT NULL,\
 COUNTY TEXT NOT NULL,\
 COU_VAL TEXT NOT NULL,\
@@ -25,9 +25,9 @@ CITY_VAL TEXT NOT NULL,\
 STA_VAL TEXT NOT NULL);')     #创建表
 
 '''========================================='''#读取文档保存到库
-sta_ins='INSERT INTO STATE (ID,STA,STA_VAL) VALUES (?,?,?)'
-city_ins='INSERT INTO CITY (ID,CITY,CITY_VAL,STA_VAL) VALUES (?,?,?,?)'
-coun_ins='INSERT INTO COUNTY (ID,COUNTY,COU_VAL,CITY_VAL,STA_VAL) VALUES (?,?,?,?,?)'
+sta_ins='INSERT INTO STATES (ID,STA,STA_VAL) VALUES (?,?,?)'
+city_ins='INSERT INTO CITYS (ID,CITY,CITY_VAL,STA_VAL) VALUES (?,?,?,?)'
+coun_ins='INSERT INTO COUNTYS (ID,COUNTY,COU_VAL,CITY_VAL,STA_VAL) VALUES (?,?,?,?,?)'
 
 file=open(addr+'\\city2.txt')
 b=file.read()

@@ -3,7 +3,7 @@ import os
 import sqlite3
 
 addr=os.getcwd()
-con=sqlite3.connect(addr+'\\city')  #连接数数据库，不存在就创建
+con=sqlite3.connect(addr+'\\city')  #连接数据库，不存在就创建
 cur=con.cursor() #创建游标
 cur.execute('DROP TABLE IF EXISTS STATES;')
 cur.execute('DROP TABLE IF EXISTS CITYS;')

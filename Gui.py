@@ -7,25 +7,32 @@ import os
 class Gui:
     def __init__(self,master=None):
         self.root=master
-        self.ID=IDGen()
         self.addr=os.getcwd()
         if 'city' not in os.listdir(os.getcwd()):
             os.system(self.addr+'\\sqlite_pre.py') 
         self.create_frame()
+        self.state_gen()
+        self.city_gen()
+        self.county_gen()
+        self.year_gen()
+        self.month_gen()
+        self.day_gen()
+        self.sex_gen()
+        self.gen_btn()
     def create_frame(self):
         self.frm=tk.LabelFrame(self.root,text='',bg='black',fg='blue')
         self.frm_result=tk.LabelFrame(self.root,text='',bg='#292929',fg='#1E90FF')
         self.frm.grid(row=0,column=0,sticky='wesn')
         self.frm_result.grid(row=1,column=0,sticky='wesn')
         self.create_frm()
-        self.create_frm_result()
 
     #生成按钮
-    def clickMe(self):
+    def clickMe(self,*args):
         self.ID=IDGen()
         self.ID.SetNum(self.state.get(),self.city.get(),self.county.get())
         self.ID.SetSex(self.sex.get())
         self.ID.SetBirth(self.year.get(),self.month.get(),self.day.get())
+        self.create_frm_result()
 
     def create_frm(self):
         self.frm_top =tk.LabelFrame(self.frm)
@@ -39,75 +46,97 @@ class Gui:
 否则后果自负!'''
         self.aten=ttk.Label(self.frm,text=self.a)
         self.aten.grid(column=1,row=2)
+        self.state_gen()
 
-    #省份下拉列表
+    def gen_btn(self,*args):
+        self.action = ttk.Button(self.frm,text='生成',width=10,textvariable=tk.StringVar())
+        self.action.winfo_rgb(color='red')
+        self.action.grid(column=1,row=5)
+        self.action.bind('<Button>',self.clickMe)
 
-        self.state=IDGen()
-        self.state_li=list(self.state.GetNumList('state'))
-        self.state=ttk.Combobox(self.frm,width=12,state='readonly')
-        self.state['values']=(self.state_li)
-        self.state.grid(column=0,row=3)
-        self.state.current(0)
-        
-    #地级市
+    #性别
+    def sex_gen(self,*args):
+        self.sex=ttk.Combobox(self.frm,width=4)
+        self.sex['values']=('男','女')
+        self.sex.grid(column=0,row=5)
+        self.sex.current(0)
+        self.sex.bind('<FocusOut>',self.gen_btn)   
 
-        self.conn=sql.connect(self.addr+'\\city')
-        self.cur=self.conn.cursor()
-        self.city=self.cur.execute('SELECT CITY FROM CITYS AS C INNER JOIN STATES AS S ON C.STA_VAL=S.STA_VAL WHERE STA=?',(self.state.get(),))
-        self.city_li=list(self.city)
-        self.city=ttk.Combobox(self.frm,width=12,state='readonly')
-        self.city['values']=(self.city_li)
-        self.city.grid(column=1,row=3)
-        self.city.current(0)
+    def day_gen(self,*args):
+        self.y=self.year.get()
+        self.m=self.month.get()
+        if self.m==2 and self.y%400==0:
+            self.day_li=[x for x in range(1,29)]
+        elif self.m==2 :
+            self.day_li=[x for x in range(1,30)]
+        elif self.m in [1,3,5,7,8,10,12]:
+            self.day_li=[x for x in range(1,32)]
+        else:
+            self.day_li=[x for x in range(1,31)]
+        self.day=ttk.Combobox(self.frm,width=12,textvariable=tk.StringVar())
+        self.day['values']=(self.day_li)
+        self.day.grid(column=2,row=4)
+        self.day.current(0)
+        self.day.bind('<FocusOut>',self.sex_gen)
 
-    #县、县级市
-
-        self.conn=sql.connect(self.addr+'\\city')
-        self.cur=self.conn.cursor()
-        self.county=self.cur.execute('SELECT COUNTY FROM COUNTYS WHERE CITY_VAL="01" AND STA_VAL="11"')
-        self.county_li=list(self.county)
-        self.county=ttk.Combobox(self.frm,width=12,state='readonly')
-        self.county['values']=(self.county_li)
-        self.county.grid(column=2,row=3)
-        self.county.current(0)
+    def month_gen(self,*args):
+        self.month=ttk.Combobox(self.frm,width=12,textvariable=tk.StringVar())
+        self.month_li=[x for x in range(1,13)]
+        self.month['values']=(self.month_li)
+        self.month.grid(column=1,row=4)
+        self.month.current(0)
+        self.month.bind('<FocusOut>',self.day_gen)
 
     #生日
-
-        self.year=ttk.Combobox(self.frm,width=12)
+    def year_gen(self,*args):
+        self.year=ttk.Combobox(self.frm,width=12,textvariable=tk.StringVar())
         self.year_li=[x for x in range(1900,2018)]
         self.year_li.reverse()
         self.year['values']=(self.year_li)
         self.year.grid(column=0,row=4)
         self.year.current(0)
-
-        self.month=ttk.Combobox(self.frm,width=12)
-        self.month_li=[x for x in range(1,13)]
-        self.month['values']=(self.month_li)
-        self.month.grid(column=1,row=4)
-        self.month.current(0)
-
-        self.day=ttk.Combobox(self.frm,width=12)
-        self.day_li=[x for x in range(1,31)]
-        self.day['values']=(self.day_li)
-        self.day.grid(column=2,row=4)
-        self.day.current(0)
+        self.year.bind('<FocusOut>',self.month_gen)
         
-    #性别
+    #县、县级市
+    def county_gen(self,*args):
+        self.conn=sql.connect(self.addr+'\\city')
+        self.cur=self.conn.cursor()
+        self.county=self.cur.execute('SELECT COUNTY FROM COUNTYS WHERE CITY_VAL IN (SELECT CITY_VAL FROM CITYS WHERE CITY=?) AND STA_VAL IN (SELECT STA_VAL FROM STATES WHERE STA=?)',(self.city.get(),self.state.get(),))
+        self.county_li=list(self.county)
+        self.county=ttk.Combobox(self.frm,width=12,state='readonly',textvariable=tk.StringVar())
+        self.county['values']=(self.county_li)
+        self.county.grid(column=2,row=3)
+        self.county.current(0)
+        self.county.bind('<FocusOut>',self.year_gen)
 
-        self.sex=ttk.Combobox(self.frm,width=4)
-        self.sex['values']=('男','女')
-        self.sex.grid(column=0,row=5)
-        self.sex.current(0)
-        
-    def create_frm_result(self):
-        self.action = ttk.Button(self.frm,text='生成',width=10)
-        self.action.winfo_rgb(color='red')
-        self.action.grid(column=1,row=5)
-        self.action.bind('<Button1>',self.clickMe())
+    #地级市
+    def city_gen(self,*args):
+        self.conn=sql.connect(self.addr+'\\city')
+        self.cur=self.conn.cursor()
+        self.city=self.cur.execute('SELECT CITY FROM CITYS AS C INNER JOIN STATES AS S \
+ON C.STA_VAL=S.STA_VAL WHERE STA=?',(self.state.get(),))
+        self.city_li=list(self.city)
+        self.city=ttk.Combobox(self.frm,width=12,state='readonly',textvariable=tk.StringVar())
+        self.city['values']=(self.city_li)
+        self.city.grid(column=1,row=3)
+        self.city.current(0)
+        self.city.bind('<FocusOut>',self.county_gen)
 
+    #省份下拉列表
+    def state_gen(self):
+        self.conn=sql.connect(self.addr+'\\city')
+        self.cur=self.conn.cursor()
+        self.state=self.cur.execute('SELECT STA FROM STATES')
+        self.state_li=list(self.state)
+        self.state=ttk.Combobox(self.frm,width=12,state='readonly',textvariable=tk.StringVar())
+        self.state['values']=(self.state_li)
+        self.state.grid(column=0,row=3)
+        self.state.current(0)
+        self.state.bind('<FocusOut>',self.city_gen)
         
+    def create_frm_result(self):   
         self.result=self.ID.GetID()
-        self.res_tex=ttk.Label(self.frm,text=self.result)
+        self.res_tex=ttk.Label(self.frm,text=self.result,textvariable=tk.StringVar())
         self.res_tex.grid(row=6,column=0,padx=5, pady=5, sticky="wesn")
 
 root=tk.Tk()

@@ -12,6 +12,7 @@ class Gui:
         if 'city' not in os.listdir(os.getcwd()):
             os.system(self.addr+'\\sqlite_pre.py') 
         self.create_frame()
+        
     def create_frame(self):
         self.frm=tk.LabelFrame(self.root,text='',bg='black',fg='blue')
         self.frm_result=tk.LabelFrame(self.root,text='',bg='#292929',fg='#1E90FF')
@@ -22,10 +23,9 @@ class Gui:
 
     #生成按钮
     def clickMe(self):
-        self.ID=IDGen()
-        self.ID.SetNum(self.state.get(),self.city.get(),self.county.get())
-        self.ID.SetSex(self.sex.get())
-        self.ID.SetBirth(self.year.get(),self.month.get(),self.day.get())
+        self.ID_result()
+        
+        
 
     def create_frm(self):
         self.frm_top =tk.LabelFrame(self.frm)
@@ -48,12 +48,14 @@ class Gui:
         self.state['values']=(self.state_li)
         self.state.grid(column=0,row=3)
         self.state.current(0)
+        self.city_gen()
         
     #地级市
-
+    def city_gen(self,*args):
         self.conn=sql.connect(self.addr+'\\city')
         self.cur=self.conn.cursor()
-        self.city=self.cur.execute('SELECT CITY FROM CITYS AS C INNER JOIN STATES AS S ON C.STA_VAL=S.STA_VAL WHERE STA=?',(self.state.get(),))
+        self.city=self.cur.execute('SELECT CITY FROM CITYS AS C INNER JOIN STATES AS S \
+ON C.STA_VAL=S.STA_VAL WHERE STA=?',(self.state.get(),))
         self.city_li=list(self.city)
         self.city=ttk.Combobox(self.frm,width=12,state='readonly')
         self.city['values']=(self.city_li)
@@ -70,6 +72,7 @@ class Gui:
         self.county['values']=(self.county_li)
         self.county.grid(column=2,row=3)
         self.county.current(0)
+        self.county.bind('<B1>',self.ID.SetNum(self.state.get(),self.city.get(),self.county.get()))
 
     #生日
 
@@ -91,6 +94,7 @@ class Gui:
         self.day['values']=(self.day_li)
         self.day.grid(column=2,row=4)
         self.day.current(0)
+        self.day.bind('<FocusOut>',self.ID.SetBirth(self.year.get(),self.month.get(),self.day.get()))
         
     #性别
 
@@ -98,6 +102,7 @@ class Gui:
         self.sex['values']=('男','女')
         self.sex.grid(column=0,row=5)
         self.sex.current(0)
+        self.sex.bind('<FocusOut>',self.ID.SetSex(self.sex.get()))
         
     def create_frm_result(self):
         self.action = ttk.Button(self.frm,text='生成',width=10)
@@ -105,12 +110,15 @@ class Gui:
         self.action.grid(column=1,row=5)
         self.action.bind('<Button1>',self.clickMe())
 
-        
+    def ID_result(self):
         self.result=self.ID.GetID()
         self.res_tex=ttk.Label(self.frm,text=self.result)
         self.res_tex.grid(row=6,column=0,padx=5, pady=5, sticky="wesn")
 
 root=tk.Tk()
 root.title('身份证号生成器')
-app=Gui(root)
+Gui(master=root)
+a=Gui()
+a.state.bind("<<ComboboxSelected>>", a.city_gen())
+
 root.mainloop()

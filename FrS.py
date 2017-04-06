@@ -23,11 +23,8 @@ class IDGen:
         self.cur.close()
         self.con.close()
 
-    def GetNumList(self,menu):
+    def GetNumList(self,menu=None):
         if menu=='state':   
-            self.conn=sql.connect(self.addr+'\\city')
-            self.cur=self.conn.cursor()
-            self.state=self.cur.execute('SELECT STA FROM STATES')
             return self.state
         if menu=='city':
             return self.city

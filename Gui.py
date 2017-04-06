@@ -1,3 +1,4 @@
+#!/usr/bin/env python3  
 # coding=utf-8
 import tkinter as tk
 from tkinter import ttk
@@ -19,48 +20,63 @@ class Gui:
         self.day_gen()
         self.sex_gen()
         self.gen_btn()
+        self.ID_pcs()
+        self.ID=IDGen()
     def create_frame(self):
-        self.frm=tk.LabelFrame(self.root,text='',bg='black',fg='blue')
-        self.frm_result=tk.LabelFrame(self.root,text='',bg='#292929',fg='#1E90FF')
+        self.frm=tk.LabelFrame(self.root,bg='orange',fg='blue')
         self.frm.grid(row=0,column=0,sticky='wesn')
-        self.frm_result.grid(row=1,column=0,sticky='wesn')
         self.create_frm()
 
-    #生成按钮
-    def clickMe(self,*args):
-        self.ID=IDGen()
-        self.ID.SetNum(self.state.get(),self.city.get(),self.county.get())
-        self.ID.SetSex(self.sex.get())
-        self.ID.SetBirth(self.year.get(),self.month.get(),self.day.get())
-        self.create_frm_result()
+    
 
     def create_frm(self):
         self.frm_top =tk.LabelFrame(self.frm)
+        self.frm_result =tk.LabelFrame(self.frm)
         self.frm_top.grid(row=0, column=0, padx=5, pady=5, sticky="wesn")
+        self.frm_result.grid(row=1, column=0, padx=5, pady=5, sticky="wesn")
         self.create_frm_top()
 
     def create_frm_top(self):
         
-        self.a='''仅用于测试使用
-请不要用生成的身份证号码做任何非法活动
+        self.a='''仅用于测试使用请不要用生成的身份证号码做任何非法活动
 否则后果自负!'''
-        self.aten=ttk.Label(self.frm,text=self.a)
+        self.aten=ttk.Label(self.frm_top,text=self.a)
         self.aten.grid(column=1,row=2)
         self.state_gen()
 
+    def SetPcs(self,*args):
+        self.times=self.pcs.get()
+
+    #生成按钮
+    def clickMe(self,*args):
+        self.ID.SetNum(self.state.get(),self.city.get(),self.county.get())
+        self.ID.SetSex(self.sex.get())
+        self.ID.SetBirth(self.year.get(),self.month.get(),self.day.get())
+        print(self.times)
+        for i in range(int(self.times)):
+            self.name=[]
+            self.name.append(self.ID.GetID())
+        self.create_frm_result()
+
     def gen_btn(self,*args):
-        self.action = ttk.Button(self.frm,text='生成',width=10,textvariable=tk.StringVar())
-        self.action.winfo_rgb(color='red')
-        self.action.grid(column=1,row=5)
+        self.action = ttk.Button(self.frm_top,text='生成',width=14,textvariable=tk.StringVar())
+        self.action.grid(column=2,row=5)
         self.action.bind('<Button>',self.clickMe)
+
+    def ID_pcs(self,*args):
+        self.pcs = ttk.Combobox(self.frm_top,width=14,textvariable=tk.StringVar())
+        self.pcs.grid(column=1,row=5)
+        self.pcs['values']=[1,5,10,99]
+        self.pcs.current(0)
+        self.pcs.bind('<<ComboboxSelected>>',self.SetPcs)
 
     #性别
     def sex_gen(self,*args):
-        self.sex=ttk.Combobox(self.frm,width=4)
+        self.sex=ttk.Combobox(self.frm_top,width=14)
         self.sex['values']=('男','女')
         self.sex.grid(column=0,row=5)
         self.sex.current(0)
-        self.sex.bind('<FocusOut>',self.gen_btn)   
+        self.sex.bind('<<ComboboxSelected>>',self.gen_btn)   
 
     def day_gen(self,*args):
         self.y=self.year.get()
@@ -73,29 +89,29 @@ class Gui:
             self.day_li=[x for x in range(1,32)]
         else:
             self.day_li=[x for x in range(1,31)]
-        self.day=ttk.Combobox(self.frm,width=12,textvariable=tk.StringVar())
+        self.day=ttk.Combobox(self.frm_top,width=14,textvariable=tk.StringVar())
         self.day['values']=(self.day_li)
         self.day.grid(column=2,row=4)
         self.day.current(0)
-        self.day.bind('<FocusOut>',self.sex_gen)
+        self.day.bind('<<ComboboxSelected>>',self.sex_gen)
 
     def month_gen(self,*args):
-        self.month=ttk.Combobox(self.frm,width=12,textvariable=tk.StringVar())
+        self.month=ttk.Combobox(self.frm_top,width=14,textvariable=tk.StringVar())
         self.month_li=[x for x in range(1,13)]
         self.month['values']=(self.month_li)
         self.month.grid(column=1,row=4)
         self.month.current(0)
-        self.month.bind('<FocusOut>',self.day_gen)
+        self.month.bind('<<ComboboxSelected>>',self.day_gen)
 
     #生日
     def year_gen(self,*args):
-        self.year=ttk.Combobox(self.frm,width=12,textvariable=tk.StringVar())
+        self.year=ttk.Combobox(self.frm_top,width=14,textvariable=tk.StringVar())
         self.year_li=[x for x in range(1900,2018)]
         self.year_li.reverse()
         self.year['values']=(self.year_li)
         self.year.grid(column=0,row=4)
         self.year.current(0)
-        self.year.bind('<FocusOut>',self.month_gen)
+        self.year.bind('<<ComboboxSelected>>',self.month_gen)
         
     #县、县级市
     def county_gen(self,*args):
@@ -103,11 +119,11 @@ class Gui:
         self.cur=self.conn.cursor()
         self.county=self.cur.execute('SELECT COUNTY FROM COUNTYS WHERE CITY_VAL IN (SELECT CITY_VAL FROM CITYS WHERE CITY=?) AND STA_VAL IN (SELECT STA_VAL FROM STATES WHERE STA=?)',(self.city.get(),self.state.get(),))
         self.county_li=list(self.county)
-        self.county=ttk.Combobox(self.frm,width=12,state='readonly',textvariable=tk.StringVar())
+        self.county=ttk.Combobox(self.frm_top,width=14,state='readonly',textvariable=tk.StringVar())
         self.county['values']=(self.county_li)
         self.county.grid(column=2,row=3)
         self.county.current(0)
-        self.county.bind('<FocusOut>',self.year_gen)
+        self.county.bind('<<ComboboxSelected>>',self.year_gen)
 
     #地级市
     def city_gen(self,*args):
@@ -116,11 +132,11 @@ class Gui:
         self.city=self.cur.execute('SELECT CITY FROM CITYS AS C INNER JOIN STATES AS S \
 ON C.STA_VAL=S.STA_VAL WHERE STA=?',(self.state.get(),))
         self.city_li=list(self.city)
-        self.city=ttk.Combobox(self.frm,width=12,state='readonly',textvariable=tk.StringVar())
+        self.city=ttk.Combobox(self.frm_top,width=14,state='readonly',textvariable=tk.StringVar())
         self.city['values']=(self.city_li)
         self.city.grid(column=1,row=3)
         self.city.current(0)
-        self.city.bind('<FocusOut>',self.county_gen)
+        self.city.bind('<<ComboboxSelected>>',self.county_gen)
 
     #省份下拉列表
     def state_gen(self):
@@ -128,15 +144,18 @@ ON C.STA_VAL=S.STA_VAL WHERE STA=?',(self.state.get(),))
         self.cur=self.conn.cursor()
         self.state=self.cur.execute('SELECT STA FROM STATES')
         self.state_li=list(self.state)
-        self.state=ttk.Combobox(self.frm,width=12,state='readonly',textvariable=tk.StringVar())
+        self.state=ttk.Combobox(self.frm_top,width=14,state='readonly',textvariable=tk.StringVar())
         self.state['values']=(self.state_li)
         self.state.grid(column=0,row=3)
         self.state.current(0)
-        self.state.bind('<FocusOut>',self.city_gen)
+        self.state.bind('<<ComboboxSelected>>',self.city_gen)
         
-    def create_frm_result(self):   
-        self.result=self.ID.GetID()
-        self.res_tex=ttk.Label(self.frm,text=self.result,textvariable=tk.StringVar())
+        
+    def create_frm_result(self):
+        
+##        self.strvar.set(self.name)
+        self.res_tex=ttk.Label(self.frm_result,textvariable=self.name)
+##        self.res_tex['textvariable']=self.strvar
         self.res_tex.grid(row=6,column=0,padx=5, pady=5, sticky="wesn")
 
 root=tk.Tk()

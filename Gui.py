@@ -2,15 +2,131 @@
 # coding=utf-8
 import tkinter as tk
 from tkinter import ttk
-from FrS import IDGen
 import sqlite3 as sql
+import random
 import os
+
+class sqlite_pre():
+    addr=os.getcwd()
+    con=sql.connect(addr+'\\city')  #连接数据库，不存在就创建
+    cur=con.cursor() #创建游标
+    cur.execute('DROP TABLE IF EXISTS STATES;')
+    cur.execute('DROP TABLE IF EXISTS CITYS;')
+    cur.execute('DROP TABLE IF EXISTS COUNTYS;') #清理旧库
+    cur.execute('CREATE TABLE IF NOT EXISTS STATES(\
+    ID INT PRIMARY KEY NOT NULL,\
+    STA TEXT NOT NULL,\
+    STA_VAL TEXT NOT NULL);')
+    cur.execute('CREATE TABLE IF NOT EXISTS CITYS(\
+    ID INT PRIMARY KEY NOT NULL,\
+    CITY TEXT NOT NULL,\
+    CITY_VAL TEXT NOT NULL,\
+    STA_VAL TEXT NOT NULL);')
+    cur.execute('CREATE TABLE IF NOT EXISTS COUNTYS(\
+    ID INT PRIMARY KEY NOT NULL,\
+    COUNTY TEXT NOT NULL,\
+    COU_VAL TEXT NOT NULL,\
+    CITY_VAL TEXT NOT NULL,\
+    STA_VAL TEXT NOT NULL);')     #创建表
+
+    '''========================================='''#读取文档保存到库
+    sta_ins='INSERT INTO STATES (ID,STA,STA_VAL) VALUES (?,?,?)'
+    city_ins='INSERT INTO CITYS (ID,CITY,CITY_VAL,STA_VAL) VALUES (?,?,?,?)'
+    coun_ins='INSERT INTO COUNTYS (ID,COUNTY,COU_VAL,CITY_VAL,STA_VAL) VALUES (?,?,?,?,?)'
+
+    file=open(addr+'\\city2.txt')
+    b=file.read()
+    src1=b.split('\n')
+    x=0
+    y=0
+    z=0
+    for line in src1:
+        if line[:1]!=' ' :
+            cur.execute(sta_ins,(x,line[11:],line[:2]))
+            x+=1
+        if line[2:3]!=' ' and line[7:8]!=' ':
+            cur.execute(city_ins,(y,line[17:],line[4:6],line[2:4]))
+            y+=1
+        if line[8:9]!=' ':
+            cur.execute(coun_ins,(z,line[15:],line[8:10],line[6:8],line[4:6]))
+            z+=1
+    '''========================================='''
+    file.close()
+    con.commit()#提交修改
+    cur.close()#关闭游标
+    con.close()#关闭数据库连接
+
+class IDGen:
+    def __init__(self):
+        self.addr=os.getcwd()
+        self.list_dir=os.listdir(self.addr)
+        if 'city' not in self.list_dir:
+            sqlite_pre()
+        self.state={}
+        self.city={}
+        self.county={}
+        self.con=sql.connect(self.addr+'\\city')
+        self.cur=self.con.cursor()
+        self.data=self.cur.execute('select sta,sta_val from states')
+        for i in self.data:
+            self.state.update({i[0]:i[1]})
+        self.data=self.cur.execute('select city,city_val from citys')
+        for i in self.data:
+            self.city.update({i[0]:i[1]})
+        self.data=self.cur.execute('select county,cou_val from countys')
+        for i in self.data:
+            self.county.update({i[0]:i[1]})
+        self.cur.close()
+        self.con.close()
+
+    def GetNumList(self,menu=None):
+        if menu=='state':   
+            return self.state
+        if menu=='city':
+            return self.city
+        if menu=='county':
+            return self.county
+
+    def SetNum(self,x,y,z):        
+        self.data1=self.state.get(x)
+        self.data2=self.city.get(y)
+        if self.data2==None:
+            self.data2='00'
+        self.data3=self.county.get(z)
+        if self.data3==None:
+            self.data3='00'
+        self.data_sum=self.data1+self.data2+self.data3
+
+    def SetBirth(self,year,month,day):
+        if month<'10':
+            month='0'+month
+        if day<'10':
+            day='0'+day
+        self.birth=year+month+day
+    def SetSex(self,sex):
+        self.sex=sex
+        if self.sex=='男':
+            self.sex=random.randrange(1,9,2)
+        elif self.sex=='女':
+            self.sex=random.randrange(0,9,2)
+
+    def GetID(self):
+        id1=self.data_sum+self.birth+str(random.randint(10,99))+str(self.sex)
+
+        count = 0 #计算校验码
+        weight = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2] #权重项
+        checkcode ={'0':'1','1':'0','2':'X','3':'9','4':'8','5':'7','6':'6','7':'5','8':'5','9':'3','10':'2'} #校验码映射
+        for i in range(0,len(id1)):
+            count = count +int(id1[i])*weight[i]
+        id1 = id1 + checkcode[str(count%11)] #算出校验码
+        return id1
+    
 class Gui:
     def __init__(self,master=None):
         self.root=master
         self.addr=os.getcwd()
         if 'city' not in os.listdir(os.getcwd()):
-            os.system(self.addr+'\\sqlite_pre.py') 
+             sqlite_pre()
         self.create_frame()
         self.state_gen()
         self.city_gen()
@@ -95,7 +211,6 @@ class Gui:
         self.day['values']=(self.day_li)
         self.day.grid(column=2,row=4)
         self.day.current(0)
-        self.day.bind('<<ComboboxSelected>>',self.sex_gen)
 
     def month_gen(self,*args):
         self.month=ttk.Combobox(self.frm_top,width=16,state='readonly',textvariable=tk.StringVar())
@@ -120,13 +235,14 @@ class Gui:
         self.conn=sql.connect(self.addr+'\\city')
         self.cur=self.conn.cursor()
         self.county=self.cur.execute('SELECT COUNTY FROM COUNTYS WHERE CITY_VAL IN (SELECT CITY_VAL FROM CITYS WHERE CITY=?) AND STA_VAL IN (SELECT STA_VAL FROM STATES WHERE STA=?) ORDER BY ID ASC',(self.city.get(),self.state.get(),))
+
         self.county_li=list(self.county)
+        if self.county_li==[]:
+            self.county_li=['无',]
         self.county=ttk.Combobox(self.frm_top,width=14,state='readonly',textvariable=tk.StringVar())
         self.county['values']=(self.county_li)
         self.county.grid(column=2,row=3)
-        self.county.current(0)
-        self.county.bind('<<ComboboxSelected>>',self.year_gen)
-        
+        self.county.current(0)       
 
     #地级市
     def city_gen(self,*args):
@@ -135,11 +251,17 @@ class Gui:
         self.city=self.cur.execute('SELECT CITY FROM CITYS AS C INNER JOIN STATES AS S \
 ON C.STA_VAL=S.STA_VAL WHERE STA=? ORDER BY C.ID ASC',(self.state.get(),))
         self.city_li=list(self.city)
+        if self.city_li==[]:
+            self.city_li=['无',]
         self.city=ttk.Combobox(self.frm_top,width=16,state='readonly',textvariable=tk.StringVar())
         self.city['values']=(self.city_li)
         self.city.grid(column=1,row=3)
         self.city.current(0)
         self.city.bind('<<ComboboxSelected>>',self.county_gen)
+
+    def SetCityAndCoun(self,*args):
+        self.city_gen()
+        self.county_gen()
 
     #省份下拉列表
     def state_gen(self):
@@ -151,7 +273,7 @@ ON C.STA_VAL=S.STA_VAL WHERE STA=? ORDER BY C.ID ASC',(self.state.get(),))
         self.state['values']=(self.state_li)
         self.state.grid(column=0,row=3)
         self.state.current(0)
-        self.state.bind('<<ComboboxSelected>>',self.city_gen)
+        self.state.bind('<<ComboboxSelected>>',self.SetCityAndCoun)
         
     def create_frm_result(self,*args):
         self.name=tk.StringVar()
@@ -169,3 +291,8 @@ root=tk.Tk()
 root.title('身份证号生成器')
 Gui(master=root)
 root.mainloop()
+
+
+
+          
+

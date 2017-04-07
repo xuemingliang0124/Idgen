@@ -24,15 +24,16 @@ class Gui:
         self.ID=IDGen()
 
     def create_frame(self):
-        self.frm=tk.LabelFrame(self.root,bg='purple',fg='blue')
-        self.frm.grid(row=0,column=0,sticky='wesn')
+        '''
+        新建窗口，分为上下2个部分，下半部分为状态栏
+        '''
+        self.frm = tk.LabelFrame(self.root, 
+                                     text="", 
+                                     bg="purple", 
+                                     fg="#1E90FF")
+        self.frm.grid(row=0, column=0, sticky="wesn")
         self.create_frm()
-        self.create_frm_result()
 
-    #生成按钮
-    def clickMe(self):
-        self.ID_result()
-        
     def create_frm(self):
         self.frm_top =tk.LabelFrame(self.frm)
         self.frm_result =tk.LabelFrame(self.frm)
@@ -49,25 +50,6 @@ class Gui:
 
     def SetPcs(self,*args):
         self.times=self.pcs.get()
-        self.state=IDGen()
-        self.state_li=list(self.state.GetNumList('state'))
-        self.state=ttk.Combobox(self.frm,width=12,state='readonly')
-        self.state['values']=(self.state_li)
-        self.state.grid(column=0,row=3)
-        self.state.current(0)
-        self.city_gen()
-        
-    #地级市
-    def city_gen(self,*args):
-        self.conn=sql.connect(self.addr+'\\city')
-        self.cur=self.conn.cursor()
-        self.city=self.cur.execute('SELECT CITY FROM CITYS AS C INNER JOIN STATES AS S \
-ON C.STA_VAL=S.STA_VAL WHERE STA=?',(self.state.get(),))
-        self.city_li=list(self.city)
-        self.city=ttk.Combobox(self.frm,width=12,state='readonly')
-        self.city['values']=(self.city_li)
-        self.city.grid(column=1,row=3)
-        self.city.current(0)
 
     #生成按钮
     def clickMe(self,*args):
@@ -80,15 +62,7 @@ ON C.STA_VAL=S.STA_VAL WHERE STA=?',(self.state.get(),))
         self.action = ttk.Button(self.frm_top,text='生成',width=14)
         self.action.grid(column=2,row=5)
         self.action.bind('<Button>',self.clickMe)
-        self.conn=sql.connect(self.addr+'\\city')
-        self.cur=self.conn.cursor()
-        self.county=self.cur.execute('SELECT COUNTY FROM COUNTYS WHERE CITY_VAL="01" AND STA_VAL="11"')
-        self.county_li=list(self.county)
-        self.county=ttk.Combobox(self.frm,width=12,state='readonly')
-        self.county['values']=(self.county_li)
-        self.county.grid(column=2,row=3)
-        self.county.current(0)
-        self.county.bind('<B1>',self.ID.SetNum(self.state.get(),self.city.get(),self.county.get()))
+       
 
     def ID_pcs(self,*args):
         self.pcs = ttk.Combobox(self.frm_top,width=16,state='readonly',textvariable=tk.StringVar())
@@ -131,13 +105,6 @@ ON C.STA_VAL=S.STA_VAL WHERE STA=?',(self.state.get(),))
         self.month.current(0)
         self.month.bind('<<ComboboxSelected>>',self.day_gen)
 
-        self.day=ttk.Combobox(self.frm,width=12)
-        self.day_li=[x for x in range(1,31)]
-        self.day['values']=(self.day_li)
-        self.day.grid(column=2,row=4)
-        self.day.current(0)
-        self.day.bind('<FocusOut>',self.ID.SetBirth(self.year.get(),self.month.get(),self.day.get()))
-
     #生日
     def year_gen(self,*args):
         self.year=ttk.Combobox(self.frm_top,width=14,state='readonly',textvariable=tk.StringVar())
@@ -159,21 +126,7 @@ ON C.STA_VAL=S.STA_VAL WHERE STA=?',(self.state.get(),))
         self.county.grid(column=2,row=3)
         self.county.current(0)
         self.county.bind('<<ComboboxSelected>>',self.year_gen)
-        self.sex=ttk.Combobox(self.frm,width=4)
-        self.sex['values']=('男','女')
-        self.sex.grid(column=0,row=5)
-        self.sex.current(0)
-        self.sex.bind('<FocusOut>',self.ID.SetSex(self.sex.get()))
         
-    def create_frm_result(self):
-        self.action = ttk.Button(self.frm,text='生成',width=10)
-        self.action.winfo_rgb(color='red')
-        self.action.grid(column=1,row=5)
-        self.action.bind('<Button1>',self.clickMe())
-
-    def ID_result(self):
-        self.result=self.ID.GetID()
-        self.res_tex=ttk.Label(self.frm,text=self.result)
 
     #地级市
     def city_gen(self,*args):
@@ -215,7 +168,4 @@ ON C.STA_VAL=S.STA_VAL WHERE STA=? ORDER BY C.ID ASC',(self.state.get(),))
 root=tk.Tk()
 root.title('身份证号生成器')
 Gui(master=root)
-a=Gui()
-a.state.bind("<<ComboboxSelected>>", a.city_gen())
-
 root.mainloop()

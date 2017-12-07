@@ -12,10 +12,6 @@ sys.path.append(pypath)
 import IDGen
 import sqlite_pre
 
-<<<<<<< HEAD
-=======
-    
->>>>>>> 9073bbb5a434e727b55e90673aa47ede6194f3a9
 class Gui:
     def __init__(self,master=None):
         self.root=master
@@ -32,11 +28,7 @@ class Gui:
         self.sex_gen()
         self.gen_btn()
         self.ID_pcs()
-<<<<<<< HEAD
 
-=======
-
->>>>>>> 9073bbb5a434e727b55e90673aa47ede6194f3a9
     def create_frame(self):
         '''
         新建窗口，分为上下2个部分，下半部分为状态栏

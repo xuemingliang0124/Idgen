@@ -12,6 +12,10 @@ sys.path.append(pypath)
 import IDGen
 import sqlite_pre
 
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 9073bbb5a434e727b55e90673aa47ede6194f3a9
 class Gui:
     def __init__(self,master=None):
         self.root=master
@@ -28,7 +32,11 @@ class Gui:
         self.sex_gen()
         self.gen_btn()
         self.ID_pcs()
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> 9073bbb5a434e727b55e90673aa47ede6194f3a9
     def create_frame(self):
         '''
         新建窗口，分为上下2个部分，下半部分为状态栏
@@ -55,7 +63,7 @@ class Gui:
         self.state_gen()
 
     def SetPcs(self,*args):
-        self.times=self.pcs.get()
+        self.times=int(self.pcs.get())
 
     #生成按钮
     def clickMe(self,*args):
@@ -126,8 +134,9 @@ class Gui:
         self.conn=sql.connect(self.addr+'\\city')
         self.cur=self.conn.cursor()
         self.county=self.cur.execute('SELECT COUNTY FROM COUNTYS WHERE CITY_VAL IN (SELECT CITY_VAL FROM CITYS WHERE CITY=?) AND STA_VAL IN (SELECT STA_VAL FROM STATES WHERE STA=?) ORDER BY ID ASC',(self.city.get(),self.state.get(),))
-
-        self.county_li=list(self.county)
+        self.county_li=[]
+        for i in self.county:
+            self.county_li.append(i[0])
         if self.county_li==[]:
             self.county_li=['无',]
         self.county=ttk.Combobox(self.frm_top,width=14,state='readonly',textvariable=tk.StringVar())
@@ -141,7 +150,9 @@ class Gui:
         self.cur=self.conn.cursor()
         self.city=self.cur.execute('SELECT CITY FROM CITYS AS C INNER JOIN STATES AS S \
 ON C.STA_VAL=S.STA_VAL WHERE STA=? ORDER BY C.ID ASC',(self.state.get(),))
-        self.city_li=list(self.city)
+        self.city_li=[]
+        for i in self.city:
+            self.city_li.append(i[0])
         if self.city_li==[]:
             self.city_li=['无',]
         self.city=ttk.Combobox(self.frm_top,width=16,state='readonly',textvariable=tk.StringVar())
@@ -159,24 +170,28 @@ ON C.STA_VAL=S.STA_VAL WHERE STA=? ORDER BY C.ID ASC',(self.state.get(),))
         self.conn=sql.connect(self.addr+'\\city')
         self.cur=self.conn.cursor()
         self.state=self.cur.execute('SELECT STA FROM STATES ORDER BY ID ASC')
-        self.state_li=list(self.state)
+        self.state_li=[]
+        for i in self.state:
+            self.state_li.append(i[0])
         self.state=ttk.Combobox(self.frm_top,width=14,state='readonly',textvariable=tk.StringVar())
         self.state['values']=(self.state_li)
         self.state.grid(column=0,row=3)
         self.state.current(0)
         self.state.bind('<<ComboboxSelected>>',self.SetCityAndCoun)
         
+    def result_text(self,*args):
+        self.res_tex=tk.Text(self.frm_result,height=20,width=20)
+        self.res_tex.pack()
     def create_frm_result(self,*args):
-        self.name=tk.StringVar()
-        self.IDs=''
+        self.res_tex.delete(0.0,'end')
         if self.pcs.get()=='1':
-            self.IDs=self.ID.GetID()
+            self.res_tex.insert(1.0, self.ID.GetID())
         else:
-            for i in range(int(self.pcs.get())):
-                self.IDs=self.IDs+self.ID.GetID()+'\n'
-        self.res_tex=ttk.Label(self.frm_result)
-        self.res_tex['text']=self.IDs
-        self.res_tex.grid(row=6,column=0,padx=5, pady=5, sticky="wesn")
+            for i in range(0,int(self.pcs.get())):
+                a=self.ID.GetID()+'\n'
+                i=str(i)+'.0'
+                self.res_tex.insert(i, a)
+
 
 root=tk.Tk()
 root.title('身份证号生成器')

@@ -37,7 +37,7 @@ class IDGen:
         if menu=='county':
             return self.county
 
-    def SetNum(self, x: object, y: object, z: object) -> object:
+    def SetNum(self, x, y, z):
         self.data1=self.state.get(x)
         self.data2=self.city.get(y)
         if self.data2==None:
@@ -48,9 +48,9 @@ class IDGen:
         self.data_sum=self.data1+self.data2+self.data3
 
     def SetBirth(self,year,month,day):
-        if month<'10':
+        if int(month)<10:
             month='0'+month
-        if day<'10':
+        if int(day)<10:
             day='0'+day
         self.birth=year+month+day
     def SetSex(self,sex):

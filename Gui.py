@@ -171,18 +171,17 @@ ON C.STA_VAL=S.STA_VAL WHERE STA=? ORDER BY C.ID ASC',(self.state.get(),))
         self.state.current(0)
         self.state.bind('<<ComboboxSelected>>',self.SetCityAndCoun)
         
-    def result_text(self,*args):
-        self.res_tex=tk.Text(self.frm_result,height=20,width=20)
-        self.res_tex.pack()
+
     def create_frm_result(self,*args):
-        self.res_tex.delete(0.0,'end')
+        self.IDs=''
         if self.pcs.get()=='1':
-            self.res_tex.insert(1.0, self.ID.GetID())
+            self.IDs=self.ID.GetID()
         else:
             for i in range(0,int(self.pcs.get())):
-                a=self.ID.GetID()+'\n'
-                i=str(i)+'.0'
-                self.res_tex.insert(i, a)
+                self.IDs+=(self.ID.GetID()+'\n')
+        self.res_tex=ttk.Label(self.frm_result)
+        self.res_tex['text']=self.IDs
+        self.res_tex.grid(row=6,column=0,padx=5, pady=5, sticky="wesn")
 
 
 root=tk.Tk()
